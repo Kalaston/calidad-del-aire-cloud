@@ -1,0 +1,34 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: debian:stretch
+
+    steps:
+      - checkout
+
+      - run:
+          name: Print the Current Time
+          command: date
+      - run:
+          name: Salute
+          command: echo Starting CircleCI Cloud Script...
+  deploy-prod:
+    docker:
+      - image: circleci/node:10.5
+    steps:
+      - checkout
+      - run: ssh -oStrictHostKeyChecking=no -v $DROPLET_USER@$DROPLET_IP "sudo ./calidad-del-aire-cloud/scripts/deploy_project.sh"
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy-prod:
+          filters:
+            branches:
+              only:
+                - master
+          requires:
+            - build
