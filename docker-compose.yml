@@ -16,20 +16,23 @@ services:
     ports:
       - '27017:27017'
   api:
-    container_name: api-dev
+    image: node:10.5.0
     env_file: .env
-    build:
-      dockerfile: Dockerfile.dev
-      context: ./api
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./api:/app
+    working_dir: /app
+    command: npm run dev
+    ports:
+      - 5000:5000
     links:
       - mongo
     depends_on:
       - mongo
-    volumes:
-      - ./api/src:/app/src
-      - ./api/node_modules:/app/node/modules
     environment:
       - MONGO_USER=${MONGO_USER}
+      - ISDEV=HI
       - MONGO_PASSWORD=${MONGO_PASSWORD}
       - MONGO_DATABASE=${MONGO_DATABASE}
   client:
